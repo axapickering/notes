@@ -1,9 +1,9 @@
 """Flask app for Notes"""
 
 import os
-from flask import Flask, redirect, render_template, session
+from flask import Flask, redirect, render_template, session, flash
 from models import db, connect_db, User
-from forms import RegisterNewUserForm, LoginForm, CSRFProtectForm
+from forms import RegisterNewUserForm, LoginForm, CSRFProtectForm, EditNoteForm, AddNoteForm
 from werkzeug.exceptions import Unauthorized
 
 app = Flask(__name__)
@@ -16,7 +16,9 @@ app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "nibblers"
 
 connect_db(app)
-#TODO: make global var for session username
+
+USERNAME = "username"
+
 
 @app.get("/")
 def home_page():
@@ -30,7 +32,8 @@ def handle_registration_form():
     ''' Gets the user registration form
         Handles creation of new user on submit '''
 
-    #TODO: if user is already logged in, redirect to user's page
+    if (USERNAME in session):
+        return redirect(f"/user/{session[USERNAME]}")
 
     form = RegisterNewUserForm()
 
@@ -47,6 +50,8 @@ def handle_registration_form():
 
         session["username"] = user.username
 
+        flash("User successfully registered")
+
         return redirect(f"/users/{username}")
 
     else:
@@ -57,7 +62,8 @@ def handle_registration_form():
 def login():
     """Produce login form or handle login"""
 
-    #TODO: redirect if already logged in
+    if (USERNAME in session):
+        return redirect(f"/user/{session[USERNAME]}")
 
     form = LoginForm()
 
@@ -69,6 +75,7 @@ def login():
 
         if user:
             session["username"] = username
+            flash(f"User {username} successfully logged in")
             return redirect(f"/users/{username}")
 
         else:
@@ -81,27 +88,19 @@ def login():
 def get_user_info_page(username):
     ''' Gets a page with info about a specific user
         Only visible by that user '''
-    #TODO: raise a unauthorized flask error (401) import
-    #raise Unauthorized
-    #put guard at top
-    #TODO: add flash messages
 
+    if (USERNAME not in session or session[USERNAME] != username):
 
-    if (session["username"] == username):
+        raise Unauthorized()
+
+    else:
 
         user = User.query.get_or_404(username)
         return render_template(
             "user_page.html",
             user=user,
+            notes=user.notes,
             form=CSRFProtectForm())
-
-    elif (session["username"]):
-
-        return redirect(f"/users/{username}")
-
-    else:
-
-        return redirect("/register")
 
 
 @app.post("/logout")
@@ -109,12 +108,15 @@ def logout():
     ''' Logs the user out
         Redirects to the login page '''
 
-    #TODO: else: raise unauthorized
-
     form = CSRFProtectForm()
 
     if form.validate_on_submit():
 
         session.pop("username", None)
+        flash("Successfully logged out.")
+        return redirect("/login")
 
-    return redirect("/login")
+    else:
+
+        raise Unauthorized()
+

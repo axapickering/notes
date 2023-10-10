@@ -13,4 +13,15 @@
   <button type="submit" class="btn btn-primary">Logout</button>
 </form>
 
+<a href=""></a>
+<ul>
+  {% for note in notes %}
+  <li><a formaction="/notes/{{ note.id }}/update">{{ note.title }}</a>
+    <p>{{ note.content }}</p>
+    <a formmethod="POST" formaction="/notes/{{ note.id }}/delete" class="btn btn-danger">Delete</a>
+  </li>
+  {% endfor %}
+</ul>
+
+
 {% endblock %}

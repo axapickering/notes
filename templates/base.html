@@ -10,16 +10,31 @@
 
 <body>
 
+
+
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-8 p-4">
-        <div class = "justify-content-center">
-        {% block content %}
-        {% endblock%}
+      <div class="col-4 p-4">
+        {% for msg in get_flashed_messages() %}
+        <div class="alert alert-success" role="alert">
+          {{ msg }}
         </div>
+        {% endfor %}
       </div>
     </div>
   </div>
+
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-8 p-4">
+          {% block content %}
+          {% endblock%}
+      </div>
+    </div>
+  </div>
+
+
 
 </body>
 
