@@ -48,9 +48,9 @@ class User(db.Model):
         nullable=False
     )
 
-    @classmethod
+    @classmethod #TODO: consider adding user to db here
     def register(cls, username, password, email, first_name, last_name):
-        """Register user with hashed password, return user"""
+        """Register user and hash password, return user"""
 
         hashed = bcrypt.generate_password_hash(password).decode('utf8')
 

@@ -1,13 +1,10 @@
 """Flask app for Notes"""
 
 import os
-
 from flask import Flask, redirect, render_template, session
-
 from models import db, connect_db, User
-
 from forms import RegisterNewUserForm, LoginForm, CSRFProtectForm
-
+from werkzeug.exceptions import Unauthorized
 
 app = Flask(__name__)
 
@@ -19,10 +16,10 @@ app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "nibblers"
 
 connect_db(app)
-
+#TODO: make global var for session username
 
 @app.get("/")
-def get_registration_page():
+def home_page():
     ''' Sends the user to the register page'''
 
     return redirect("/register")
@@ -30,8 +27,10 @@ def get_registration_page():
 
 @app.route("/register", methods=['GET', 'POST'])
 def handle_registration_form():
-    ''' Gets the user registrations form
+    ''' Gets the user registration form
         Handles creation of new user on submit '''
+
+    #TODO: if user is already logged in, redirect to user's page
 
     form = RegisterNewUserForm()
 
@@ -56,7 +55,9 @@ def handle_registration_form():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    """Produce login form and handle login"""
+    """Produce login form or handle login"""
+
+    #TODO: redirect if already logged in
 
     form = LoginForm()
 
@@ -78,8 +79,13 @@ def login():
 
 @app.get("/users/<username>")
 def get_user_info_page(username):
-    ''' Gets a a page with info about a specific user
+    ''' Gets a page with info about a specific user
         Only visible by that user '''
+    #TODO: raise a unauthorized flask error (401) import
+    #raise Unauthorized
+    #put guard at top
+    #TODO: add flash messages
+
 
     if (session["username"] == username):
 
@@ -101,7 +107,9 @@ def get_user_info_page(username):
 @app.post("/logout")
 def logout():
     ''' Logs the user out
-        Redirects to the root route '''
+        Redirects to the login page '''
+
+    #TODO: else: raise unauthorized
 
     form = CSRFProtectForm()
 

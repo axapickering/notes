@@ -12,7 +12,7 @@ class RegisterNewUserForm(FlaskForm):
         "Username:",
         validators=[InputRequired(), Length(max=20)]
     )
-
+    #TODO: add minimum
     password = PasswordField(
         "Password:",
         validators=[InputRequired(), Length(max=100)]
@@ -36,7 +36,7 @@ class RegisterNewUserForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     """Form for logging in a user"""
-
+    #TODO: remove Lengths
     username = StringField(
         "Username",
         validators=[InputRequired(), Length(max=20)]
