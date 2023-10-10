@@ -1,37 +1,39 @@
-"""Flask notes app."""
+"""Flask app for Notes"""
 
 import os
 
-from flask import Flask
-from flask_debugtoolbar import DebugToolbarExtension
+from flask import Flask, request, redirect, render_template, flash, jsonify
 
-import routes_auth
-import routes_home
-import routes_notes
-import routes_users
-from models import connect_db, bcrypt
+from models import db, connect_db, Cupcake, DEFAULT_IMAGE_URL
+
+from forms import RegisterNewUserForm
 
 
-def create_app(**config):
-    """Set up and return Flask app (pass kwargs to override default config)."""
+app = Flask(__name__)
 
-    app = Flask(__name__, root_path=".")
-    app.config.update(
-        SQLALCHEMY_DATABASE_URI=os.environ.get(
-            "DATABASE_URL", "postgresql:///flask_notes"),
-        SQLALCHEMY_ECHO=True,
-        SECRET_KEY="abc123",
-    )
-    app.config.update(config)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", "postgresql:///notes"
+)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ECHO"] = True
+app.config["SECRET_KEY"] = "nibblers"
 
-    DebugToolbarExtension(app)
+connect_db(app)
 
-    connect_db(app)
-    bcrypt.init_app(app)
+@app.get("/")
+def get_registration_page():
+    ''' Sends the user to the register page'''
 
-    app.register_blueprint(routes_auth.bp)
-    app.register_blueprint(routes_home.bp)
-    app.register_blueprint(routes_notes.bp)
-    app.register_blueprint(routes_users.bp)
+    return redirect("/register")
 
-    return app
+@app.route("/register",methods=['GET','POST'])
+def handle_registration_form():
+    ''' Gets the user registrations form
+        Handles creation of new user on submit '''
+
+    form = RegisterNewUserForm()
+
+    if form.validate_on_submit():
+
+
+
