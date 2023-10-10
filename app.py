@@ -73,3 +73,32 @@ def login():
     return render_template("login.html",form=form)
 
 
+@app.get("/users/<username>")
+def get_user_info_page(username):
+    ''' Gets a a page with info about a specific user
+        Only visible by that user '''
+
+    if (session["username"] == username):
+
+        return render_template("user_page.html")
+
+    elif (session["username"]):
+
+        return redirect(f"/users/{username}")
+
+    else:
+
+        return redirect("/register")
+
+@app.post("/logout")
+def logout():
+    ''' Logs the user out
+        Redirects to the root route '''
+
+    form = CSRFProtectForm()
+
+    if form.validate_on_submit():
+
+        session.pop("username",None)
+
+    return redirect("/")
