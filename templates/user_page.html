@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ session["username"].username }} {% endblock%}
+
+{% block content %}
+
+  <h1 class="display-4">{{ session["username"].username}}'s page</h1>
+
+  <form action="/logout" method="POST">
+    {{form.hidden_tag()}}
+    <button type="submit" class="btn btn-primary">Logout</button>
+  </form>
+
+{% endblock %}
