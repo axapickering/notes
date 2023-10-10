@@ -2,11 +2,11 @@
 
 import os
 
-from flask import Flask, request, redirect, render_template, flash, jsonify
+from flask import Flask, request, redirect, render_template, flash, jsonify, session
 
-from models import db, connect_db, Cupcake, DEFAULT_IMAGE_URL
+from models import db, connect_db, User
 
-from forms import RegisterNewUserForm
+from forms import RegisterNewUserForm, LoginForm
 
 
 app = Flask(__name__)
@@ -34,6 +34,42 @@ def handle_registration_form():
     form = RegisterNewUserForm()
 
     if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
 
+        user = User.register(username,password,email,first_name,last_name)
+        db.session.add(user)
+        db.session.commit()
+
+        session["username"] = user.username
+
+        return redirect(f"/users/{username}")
+
+    else:
+        return render_template("register.html",form=form)
+
+@app.route("/login",methods=['GET','POST'])
+def login():
+    """Produce login form and handle login"""
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        user = User.authenticate(username,password)
+
+        if user:
+            session["username"] = username
+            return redirect(f"/users/{username}")
+
+        else:
+            form.username.errors = ["Invalid username or password"]
+
+    return render_template("login.html",form=form)
 
 
