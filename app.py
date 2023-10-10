@@ -120,3 +120,29 @@ def logout():
 
         raise Unauthorized()
 
+@app.post("/users/<username>/delete")
+def delete_user(username):
+    """Removes user from database, logs the user out and redirect to home page"""
+
+    form = CSRFProtectForm()
+
+    if (
+        USERNAME not in session or
+        session[USERNAME] != username or
+        not form.validate_on_submit()
+        ):
+
+        raise Unauthorized()
+
+    elif form.validate_on_submit():
+        user = User.query.get_or_404(username)
+        session.pop("username", None)
+        db.session.delete(user.notes)
+        db.session.delete(user)
+        db.session.commit()
+
+        flash("User successfully deleted.")
+        redirect("/")
+
+
+

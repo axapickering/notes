@@ -23,5 +23,8 @@
   {% endfor %}
 </ul>
 
+<a href="/users/{{ user.username }}/notes/add">Add A Note</a>
+
+<a formmethod="POST" formaction="/users/{{ user.username }}/delete" class="btn btn-danger">Delete Account</a>
 
 {% endblock %}
