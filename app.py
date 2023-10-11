@@ -113,12 +113,14 @@ def logout():
     if form.validate_on_submit():
 
         session.clear()
+        breakpoint()
         flash("Successfully logged out.")
         return redirect("/login")
 
     else:
 
         raise Unauthorized()
+
 
 @app.post("/users/<username>/delete")
 def delete_user(username):
@@ -130,20 +132,25 @@ def delete_user(username):
         USERNAME not in session or
         session[USERNAME] != username or
         not form.validate_on_submit()
-        ):
+    ):
 
         raise Unauthorized()
 
     if (form.validate_on_submit()):
         user = User.query.get_or_404(username)
+
+        Note.query.filter_by(owner_username=username).delete()
+        # db.session.delete(user.notes)
         db.session.delete(user)
         db.session.commit()
 
-        session.pop(USERNAME, None)
+        session.pop(USERNAME)
+
         flash("User successfully deleted.")
         return redirect("/")
 
-@app.route("/users/<username>/notes/add",methods=["POST","GET"])
+
+@app.route("/users/<username>/notes/add", methods=["POST", "GET"])
 def show_add_note_form_or_add_note(username):
     ''' Shows add note form or handles add note form submission'''
 
@@ -152,7 +159,7 @@ def show_add_note_form_or_add_note(username):
     if (
         USERNAME not in session or
         session[USERNAME] != username
-        ):
+    ):
 
         raise Unauthorized()
 
@@ -162,7 +169,7 @@ def show_add_note_form_or_add_note(username):
         title = form.title.data
         content = form.content.data
 
-        note = Note(title=title,content=content)
+        note = Note(title=title, content=content)
         user.notes.append(note)
         db.session.commit()
 
@@ -171,8 +178,35 @@ def show_add_note_form_or_add_note(username):
 
     else:
 
-        return render_template("add_note.html",form=form)
+        return render_template("add_note.html", form=form)
 
 
+@app.route("/notes/<int:note_id>/update", methods=["POST", "GET"])
+def show_edit_note_form_or_edit_note(note_id):
+    ''' Shows edit note form or handles edit note form submission'''
 
+    form = EditNoteForm()
 
+    username = Note.query.get_or_404(note_id).owner_username
+    print("USERNAME", username)
+    if (
+        USERNAME not in session or
+        session[USERNAME] != username
+    ):
+
+        raise Unauthorized()
+
+    if form.validate_on_submit():
+
+        note = Note.query.get_or_404(note_id)
+        note.title = form.title.data or note.title
+        note.content = form.content.data or note.content
+
+        db.session.commit()
+
+        flash("Note successfully edited")
+        return redirect(f"/users/{username}")
+
+    else:
+
+        return render_template("edit_note.html", form=form)

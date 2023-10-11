@@ -13,12 +13,15 @@
   <button type="submit" class="btn btn-primary">Logout</button>
 </form>
 
-<a href=""></a>
-<ul>
+<br><br>
+
+<ul class="bg-secondary rounded p-3">
   {% for note in notes %}
-  <li><button formaction="/notes/{{ note.id }}/update">{{ note.title }}</button>
+  <li>
+    <p><b>{{ note.title }}</b></p>
     <p>{{ note.content }}</p>
-    <a formmethod="POST" formaction="/notes/{{ note.id }}/delete" class="btn btn-danger">Delete</a>
+    <button class = "btn btn-primary" formaction="/notes/{{ note.id }}/update">Edit Note</button>
+    <button formmethod="POST" formaction="/notes/{{ note.id }}/delete" class="btn btn-danger">Delete</button>
   </li>
   {% endfor %}
 </ul>
@@ -29,7 +32,7 @@
 
 <form >
   {{ form.hidden_tag() }}
-<a formmethod="POST" formaction="/users/{{ user.username }}/delete" class="btn btn-danger">Delete Account</a>
+<button formmethod="POST" formaction="/users/{{ user.username }}/delete" class="btn btn-danger">Delete Account</button>
 </form>
 
 {% endblock %}
