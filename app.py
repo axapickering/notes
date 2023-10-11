@@ -2,7 +2,7 @@
 
 import os
 from flask import Flask, redirect, render_template, session, flash
-from models import db, connect_db, User
+from models import db, connect_db, User, Note
 from forms import RegisterNewUserForm, LoginForm, CSRFProtectForm, EditNoteForm, AddNoteForm
 from werkzeug.exceptions import Unauthorized
 
@@ -48,7 +48,7 @@ def handle_registration_form():
         db.session.add(user)
         db.session.commit()
 
-        session["username"] = user.username
+        session[USERNAME] = user.username
 
         flash("User successfully registered")
 
@@ -74,7 +74,7 @@ def login():
         user = User.authenticate(username, password)
 
         if user:
-            session["username"] = username
+            session[USERNAME] = username
             flash(f"User {username} successfully logged in")
             return redirect(f"/users/{username}")
 
@@ -112,7 +112,7 @@ def logout():
 
     if form.validate_on_submit():
 
-        session.pop("username", None)
+        session.clear()
         flash("Successfully logged out.")
         return redirect("/login")
 
@@ -134,15 +134,45 @@ def delete_user(username):
 
         raise Unauthorized()
 
-    elif form.validate_on_submit():
+    if (form.validate_on_submit()):
         user = User.query.get_or_404(username)
-        session.pop("username", None)
-        db.session.delete(user.notes)
         db.session.delete(user)
         db.session.commit()
 
+        session.pop(USERNAME, None)
         flash("User successfully deleted.")
-        redirect("/")
+        return redirect("/")
+
+@app.route("/users/<username>/notes/add",methods=["POST","GET"])
+def show_add_note_form_or_add_note(username):
+    ''' Shows add note form or handles add note form submission'''
+
+    form = AddNoteForm()
+
+    if (
+        USERNAME not in session or
+        session[USERNAME] != username
+        ):
+
+        raise Unauthorized()
+
+    if form.validate_on_submit():
+
+        user = User.query.get_or_404(username)
+        title = form.title.data
+        content = form.content.data
+
+        note = Note(title=title,content=content)
+        user.notes.append(note)
+        db.session.commit()
+
+        flash("Note succesfully added")
+        return redirect(f"/users/{username}")
+
+    else:
+
+        return render_template("add_note.html",form=form)
+
 
 
 

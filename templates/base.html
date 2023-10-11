@@ -4,17 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://bootswatch.com/4/united/bootstrap.css">
+  <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.css">
   <title>{% block title %}{% endblock%}</title>
 </head>
 
 <body>
 
 
-
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-4 p-4">
+      <div class="col-4 p-4 ">
         {% for msg in get_flashed_messages() %}
         <div class="alert alert-success" role="alert">
           {{ msg }}
@@ -27,7 +26,7 @@
 
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-8 p-4">
+      <div class="col-8 p-4 bg-light rounded">
           {% block content %}
           {% endblock%}
       </div>

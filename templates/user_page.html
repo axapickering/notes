@@ -16,15 +16,20 @@
 <a href=""></a>
 <ul>
   {% for note in notes %}
-  <li><a formaction="/notes/{{ note.id }}/update">{{ note.title }}</a>
+  <li><button formaction="/notes/{{ note.id }}/update">{{ note.title }}</button>
     <p>{{ note.content }}</p>
     <a formmethod="POST" formaction="/notes/{{ note.id }}/delete" class="btn btn-danger">Delete</a>
   </li>
   {% endfor %}
 </ul>
 
-<a href="/users/{{ user.username }}/notes/add">Add A Note</a>
+<a href="/users/{{ user.username }}/notes/add" class="btn btn-primary">Add A Note</a>
 
+<br><br><br>
+
+<form >
+  {{ form.hidden_tag() }}
 <a formmethod="POST" formaction="/users/{{ user.username }}/delete" class="btn btn-danger">Delete Account</a>
+</form>
 
 {% endblock %}

@@ -48,7 +48,7 @@ class User(db.Model):
         nullable=False
     )
 
-    @classmethod #TODO: consider adding user to db here
+    @classmethod
     def register(cls, username, password, email, first_name, last_name):
         """Register user and hash password, return user"""
 
